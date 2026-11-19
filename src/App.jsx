@@ -19,6 +19,7 @@ export default function App() {
   });
   const [outroAparelho, setOutroAparelho] = useState('');
   const [enviado, setEnviado] = useState(false);
+  const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState('');
 
   const lidarComAgendamento = (nomeAparelho) => {
@@ -31,6 +32,7 @@ export default function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErro('');
+    setEnviando(true);
 
     // Se o cliente escolheu "Outro", envia o texto que ele digitou para o backend
     const payload = {
@@ -39,7 +41,7 @@ export default function App() {
     };
 
     try {
-      const response = await fetch('http://localhost:8080/api/agendamentos', {
+      const response = await fetch('https://sandro-backend-fbyv.onrender.com/api/agendamentos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -55,6 +57,8 @@ export default function App() {
     } catch (err) {
       console.error(err);
       setErro('Não foi possível conectar ao servidor backend.');
+    } finally {
+      setEnviando(false);
     }
   };
 
@@ -307,8 +311,13 @@ export default function App() {
 
                   {erro && <p className="alert-error">{erro}</p>}
 
-                  <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
-                    Enviar Solicitação
+                  <button
+                    type="submit"
+                    className="btn-primary"
+                    disabled={enviando}
+                    style={{ width: '100%', justifyContent: 'center', opacity: enviando ? 0.7 : 1 }}
+                  >
+                    {enviando ? 'Enviando solicitação...' : 'Enviar Solicitação'}
                   </button>
                 </form>
               )}
